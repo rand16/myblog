@@ -1,0 +1,27 @@
+{% extends "blog/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="my-4">
+    <h2>投稿</h2>
+</div>
+
+<form method="post">
+    <!--csrfトークンはフォームを作成するときに必須-->
+    {% csrf_token %}
+    <div class="formpost">
+        <!--render_fieldタグでタイトル・本文を入力するフォームを作成-->
+        {% render_field form.title class="form-control" placeholder="タイトルを入力" %}
+    </div>
+    <div class="formpost">
+        {% render_field form.content class="form-control" placeholder="本文を入力" %}
+    </div>
+    <button class="btn btn-warning" type="submit">投稿する</button>
+</form>
+
+<div class="d-flfex mb-5">
+    <a href="{% url 'index' %}" class="btn btn-primary">ブログ一覧</a>
+</div>
+
+{% endblock %}

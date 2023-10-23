@@ -1,0 +1,26 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+
+<h2 class="my-4">{{ post_data.title }}</h2>
+<hr>
+<p>{{ post_data.created_at }} by {{ post_data.author }}</p>
+<hr>
+<!--本文に入力された改行をbrタグに変更するために，linebreakbrタグでフィルタリング-->
+<p>{{ post_data.content|linebreaksbr }}</p>
+{% if user.is_authenticated %}
+    <!--ログイン状態であれば，編集・削除ボタンを表示-->
+    <hr>
+    <div class="d-flex mb-5">
+        <a href="{% url 'post_edit' post_data.id %}" class="btn btn-warning mr-2">編集する</a>
+        <a href="{% url 'post_delete' post_data.id %}" class="btn btn-danger">削除する</a>
+    </div>
+{% endif %}
+
+<div class="d-flfex mb-5">
+    <a href="{% url 'index' %}" class="btn btn-primary">ブログ一覧</a>
+</div>
+
+
+
+{% endblock %}
