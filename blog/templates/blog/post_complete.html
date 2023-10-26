@@ -1,0 +1,16 @@
+{% extends "blog/base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="my-4">
+    <h2>投稿完了</h2>
+</div>
+<hr>
+<p>投稿が完了しました</p>
+
+<div class="d-flfex mb-5">
+    <a href="{% url 'index' %}" class="btn btn-primary">ブログ一覧</a>
+</div>
+
+{% endblock %}

@@ -11,4 +11,8 @@ urlpatterns = [
     path('post/<int:pk>/edit', views.PostEditView.as_view(), name='post_edit'),
     # 投稿削除用のページ
     path('post/<int:pk>/delete', views.PostDeleteView.as_view(), name='post_delete'),
+    # 投稿内容確認用のページ
+    path('post/confirm', views.ConfirmPostView.as_view(), name='post_confirm'),
+    # 投稿完了用のページ
+    path('post/regist', views.RegistPostView.as_view(), name='post_regist'),
 ]
