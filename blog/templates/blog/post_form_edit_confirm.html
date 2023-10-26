@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="my-4">
-    <h2>投稿確認</h2>
+    <h2>投稿編集確認</h2>
 </div>
 <hr>
 <p>内容を確認してください</p>
@@ -25,7 +25,7 @@
     {% endfor %}
     <button class="btn btn-warning" type="submit" name="next" value="create">投稿する</button>
 </form>
-<form action="{% url 'post_new' %}" method="post">
+<form action="{% url 'post_edit' post_data.id %}" method="post">
     <!--csrfトークンはフォームを作成するときに必須-->
     {% csrf_token %}
     {% for field in form %}

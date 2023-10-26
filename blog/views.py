@@ -58,75 +58,21 @@ class CreatePostView(LoginRequiredMixin, CreateView):
             'form': form
         })
     
-    '''
-    # 「確認する」ボタンが押された場合
+    # 確認画面から戻ってくる場合
     def post(self, request, *args, **kwargs):
-        form = PostForm(request.POST or None)
-        if form.is_valid():
-            # リダイレクト先のパスを取得
-            redirect_url = reverse_lazy('post_confirm')
-            # パラメータのdictをurlencodeする．複数のパラメータを含める
-            parameters = urlencode({'title':form.cleaned_data['title'],'content':form.cleaned_data['content']})
-            # URLにパラメータを付与
-            url = f'{redirect_url}?{parameters}'
-            return redirect(url)
-
-        return render(request, 'blog/post_form.html', {
-            'form': form
-        })  
-    '''
-
-    
-class PostEditView(LoginRequiredMixin, View):
-    # 最初に呼ばれる関数
-    def get(self, request, *args, **kwargs):
-        # idを指定することで，特定のデータを取得できる
-        post_data = Post.objects.get(id=self.kwargs['pk'])
-        # formに編集するデータの情報を埋め込む
-        form = PostForm(
-            request.POST or None,
-            initial= {
-                'title': post_data.title,
-                'content': post_data.content
-            }
-        )
-        return render(request, 'blog/post_form.html', {
-            'form': form
-        })
-    
-    # 「確認する」ボタンが押された場合
-    def post(self, request, *args, **kwargs):
-        form = PostForm(request.POST or None)
-        if form.is_valid():
-            # リダイレクト先のパスを取得
-            redirect_url = reverse_lazy('post_confirm')
-            # パラメータのdictをurlencodeする．複数のパラメータを含める
-            parameters = urlencode({'title':form.cleaned_data['title'],'content':form.cleaned_data['content']})
-            # URLにパラメータを付与
-            url = f'{redirect_url}?{parameters}'
-            return redirect(url)
+        if request.POST.get('next', '') == 'back':
+            form = PostForm(
+                request.POST or None,
+                initial= {
+                    'title': request.POST['title'],
+                    'content': request.POST['content']
+                }
+            )
+            return render(request, 'blog/post_form.html', {
+                'form': form
+            })
         
-        return render(request, 'blog/post_form.html', {
-            'form': form
-        })
-    
-class PostDeleteView(LoginRequiredMixin, View):
-    # 最初に呼ばれる関数
-    def get(self, request, *args, **kwargs):
-        # idを指定することで，特定のデータを取得できる
-        post_data = Post.objects.get(id=self.kwargs['pk'])
-        return render(request, 'blog/post_delete.html', {
-            'post_data': post_data
-        })
-    
-    # 削除ボタンをクリックしたときに呼ばれる関数
-    def post(self, request, *args, **kwargs):
-        post_data = Post.objects.get(id=self.kwargs['pk'])
-        post_data.delete()
-        return redirect('index')
-    
 class ConfirmPostView(LoginRequiredMixin, View):
-    # 最初に呼ばれる関数
     def post(self, request, *args, **kwargs):
         form = PostForm(request.POST)
         if form.is_valid():
@@ -159,7 +105,29 @@ class RegistPostView(LoginRequiredMixin, View):
             post_data.content = request.POST['content']
             post_data.save()
             return render(request, 'blog/post_complete.html')
-        elif request.POST.get('next', '') == 'back':
+
+    
+class PostEditView(LoginRequiredMixin, View):
+    # 最初に呼ばれる関数
+    def get(self, request, *args, **kwargs):
+        # idを指定することで，特定のデータを取得できる
+        post_data = Post.objects.get(id=self.kwargs['pk'])
+        # formに編集するデータの情報を埋め込む
+        form = PostForm(
+            request.POST or None,
+            initial= {
+                'title': post_data.title,
+                'content': post_data.content
+            }
+        )
+        return render(request, 'blog/post_form_edit.html', {
+            'form': form,
+            'id': post_data.id
+        })
+    
+    # 確認画面から戻ってくる場合
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('next', '') == 'back':
             form = PostForm(
                 request.POST or None,
                 initial= {
@@ -167,6 +135,44 @@ class RegistPostView(LoginRequiredMixin, View):
                     'content': request.POST['content']
                 }
             )
-            return render(request, 'blog/post_form.html', {
+            return render(request, 'blog/post_form_edit.html', {
                 'form': form
             })
+
+class ConfirmPostEditView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        form = PostForm(request.POST)
+        if form.is_valid():
+            form = PostForm(
+                request.POST or None,
+                initial= {
+                    'title': request.POST['title'],
+                    'content': request.POST['content']
+                }
+            )
+            post_data = Post()
+            post_data.title = request.POST['title']
+            post_data.content = request.POST['content']
+            return render(request, 'blog/post_form_confirm.html', {
+                'form': form,
+                'post_data': post_data
+            })
+        else:
+            return render(request, 'blog/post_form_confirm.html', {
+                'form': form
+            })
+    
+class PostDeleteView(LoginRequiredMixin, View):
+    # 最初に呼ばれる関数
+    def get(self, request, *args, **kwargs):
+        # idを指定することで，特定のデータを取得できる
+        post_data = Post.objects.get(id=self.kwargs['pk'])
+        return render(request, 'blog/post_delete.html', {
+            'post_data': post_data
+        })
+    
+    # 削除ボタンをクリックしたときに呼ばれる関数
+    def post(self, request, *args, **kwargs):
+        post_data = Post.objects.get(id=self.kwargs['pk'])
+        post_data.delete()
+        return redirect('index')
